@@ -10,11 +10,12 @@ class PMLCode::FullUpdater < PMLCode::Updater
     full_path = directory(match)
     FileUtils.mkdir_p(full_path)
     success = false
+    content = nil
     Dir.chdir(@options.app) do
+      content = `git show origin/#{match[:chapter]}.#{match[:snapshot]}:#{match[:path]}`
       system "git archive '#{match[:chapter]}.#{match[:snapshot]}' | tar -x -C '#{full_path}'"
-      success = $?.success?
     end
-    success
+    success ? content : nil
   end
 
   def generate_update_id(match)

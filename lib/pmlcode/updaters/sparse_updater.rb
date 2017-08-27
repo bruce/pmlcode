@@ -19,7 +19,7 @@ class PMLCode::SparseUpdater < PMLCode::Updater
       File.open(full_path, 'w') do |f|
         f.write(content)
       end
-      true
+      content
     end
   end
 

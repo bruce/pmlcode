@@ -55,34 +55,52 @@ class PMLCode::Updater
     end
   end
 
-  def log(location, text)
-    $stderr.puts "#{location}#{text}"
-  end
-
   def run
     embeds.each do |embed|
-      location = File.basename(@pml) + ":#{embed.line}:"
+      puts Rainbow(File.basename(@pml) + ":#{embed.line} ").bold.underline
       match = @options.pattern.match(embed[:file])
       if match
-        dedup(location, match) { update(match) }
+        text = dedup(match) { update(match) }
+        if text
+          print Rainbow("OK").green
+          puts " : FILE #{embed[:file]}"
+          check_part!(text, embed[:part])
+        else
+          print Rainbow("ERROR").red
+          puts " : FILE #{embed[:file]}"
+        end
       else
-        log location, "NOMATCH #{embed[:file]}"
+        print Rainbow("BAD MATCH").red
+        puts " : FILE #{embed[:file]}"
+      end
+      puts
+    end
+  end
+
+  def dedup(match, &block)
+    id = generate_update_id(match)
+    if @wrote[id]
+      @wrote[id]
+    else
+      if (text = block.())
+        @wrote[id] = text
+        text
       end
     end
   end
 
-  def dedup(location, match, &block)
-    id = generate_update_id(match)
-    if @wrote[id]
-      log location, "SKIP #{id} (WROTE by #{@wrote[id][0..-2]})"
-    else
-      if block.()
-        @wrote[id] = location
-        log location, "WROTE #{id}"
+  def check_part!(text, part)
+    if part
+      content = PMLCode::Content.parse(text)
+      if content.has_part?(part)
+        print Rainbow("OK").green
       else
-        log location, "INVALID #{id}"
+        print Rainbow("MISSING").red
       end
+    else
+      print Rainbow("--").gray
     end
+    puts " : PART #{part}"
   end
 
   def generate_update_id(match)
