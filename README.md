@@ -23,11 +23,12 @@ Will generate the referenced file, extracting it from the
 `origin/02-testing.01-start` ref of `/path/to/git/working/copy`.
 
 You can also extract the entire branch using the `-t full` option,
-process as many `.pml` files as you like at once, customize the
+process as many `.pml` files as you like at once, be warned of missing
+parts, see the file content (incl highlights), customize the
 pattern used to extract the metadata from the filename, and more.
 
 See `pmlcode --help` for more details (or read `USAGE`
-in [PMLCode::CLI](./lib/pmlcode/cli.rb)).
+and the options in [PMLCode::CLI](./lib/pmlcode/cli.rb)).
 
 ## Contributing
 
