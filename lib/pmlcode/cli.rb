@@ -145,6 +145,14 @@ module PMLCode::CLI
         options.pattern = Regexp.new(value)
       end
 
+      opts.on('-c', '--content', "Show content") do
+        options.content = true
+      end
+
+      opts.on("-V", "--verbose", "Verbose output (Only useful with --content)") do
+        options.verbose = true
+      end
+
       opts.on_tail("-h", "--help", "Show this message") do
         puts opts
         exit

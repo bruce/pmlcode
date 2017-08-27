@@ -2,7 +2,7 @@ class PMLCode::Display
 
   INDENT = " " * 4
 
-  def initialize(content, part, options = {})
+  def initialize(content, part, options)
     @content = content
     @part = part
     @options = options
@@ -17,12 +17,14 @@ class PMLCode::Display
   private
 
   def format_line(line)
-    if @part && line.part != @part && @options[:expanded]
+    if @part && !line.in_part?(@part) && @options.verbose
       Rainbow(line.text).black
-    elsif line.highlighted?
-      Rainbow(line.text).yellow.bold
-    else
-      line.text
+    elsif !@part || (@part && line.in_part?(@part))
+      if line.highlighted?
+        Rainbow(line.text).yellow.bold
+      else
+        line.text
+      end
     end
   end
 

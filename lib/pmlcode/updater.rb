@@ -99,7 +99,9 @@ class PMLCode::Updater
     end
     puts " : PART #{part}"
     puts "\n"
-    puts PMLCode::Display.new(content, part)
+    if @options.content
+      puts PMLCode::Display.new(content, part, @options)
+    end
   end
 
   def generate_content_id(match)

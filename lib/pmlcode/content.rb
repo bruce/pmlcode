@@ -11,7 +11,7 @@ class PMLCode::Content
   end
 
   def has_part?(name)
-    @lines.any? { |l| l.part == name }
+    @lines.any? { |l| l.in_part?(name) }
   end
 
   def each(&block)
@@ -24,12 +24,20 @@ class PMLCode::Content
 
   class Line
 
-    attr_reader :text, :part
+    attr_reader :text
 
-    def initialize(text, part, highlighted = false)
+    def initialize(text, parts = [], highlighted = false)
       @text = text
-      @part = part
+      @parts = parts
       @highlighted = highlighted
+    end
+
+    def in_part?(part = nil)
+      if part
+        @parts.include?(part)
+      else
+        !@parts.empty?
+      end
     end
 
     def highlighted?
@@ -57,7 +65,7 @@ class PMLCode::Content
     private
 
     def run
-      @part = nil
+      @parts = []
       @highlighted = nil
       lines.map(&method(:process)).compact
     end
@@ -65,10 +73,10 @@ class PMLCode::Content
     def process(text)
       case text
       when PART_START
-        @part = $1
+        @parts << $1
         nil
       when PART_END
-        @part = nil
+        @parts.reject! { |part| part == $1 }
         nil
       when HL_START
         @highlighted = true
@@ -77,7 +85,7 @@ class PMLCode::Content
         @highlighted = false
         nil
       else
-        Line.new(text, @part, @highlighted)
+        Line.new(text, @parts.dup, @highlighted)
       end
     end
 
