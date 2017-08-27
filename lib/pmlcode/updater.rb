@@ -46,6 +46,7 @@ class PMLCode::Updater
     @options = options
     @current_prefix = nil
     @wrote = {}
+    @files = {}
   end
 
   def embeds
@@ -60,7 +61,7 @@ class PMLCode::Updater
       puts Rainbow(File.basename(@pml) + ":#{embed.line} ").bold.underline
       match = @options.pattern.match(embed[:file])
       if match
-        text = dedup(match) { update(match) }
+        text = dedup(match) { |already_wrote| update(match, already_wrote) }
         if text
           print Rainbow("OK").green
           puts " : FILE #{embed[:file]}"
@@ -78,15 +79,11 @@ class PMLCode::Updater
   end
 
   def dedup(match, &block)
-    id = generate_update_id(match)
-    if @wrote[id]
-      @wrote[id]
-    else
-      if (text = block.())
-        @wrote[id] = text
-        text
-      end
-    end
+    update_id = generate_update_id(match)
+    content_id = generate_content_id(match)
+    @files[content_id] ||= block.(@wrote[update_id])
+    @wrote[update_id] = true
+    @files[content_id]
   end
 
   def check_part!(text, part)
@@ -101,6 +98,10 @@ class PMLCode::Updater
       print Rainbow("--").gray
     end
     puts " : PART #{part}"
+  end
+
+  def generate_content_id(match)
+    match.string
   end
 
   def generate_update_id(match)

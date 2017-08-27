@@ -6,7 +6,7 @@ class PMLCode::SparseUpdater < PMLCode::Updater
 
   private
 
-  def update(match)
+  def update(match, already_wrote)
     success = false
     content = nil
     Dir.chdir(@options.app) do
@@ -14,10 +14,12 @@ class PMLCode::SparseUpdater < PMLCode::Updater
       success = $?.success?
     end
     if success
-      full_path = File.join(directory(match), match[:path])
-      FileUtils.mkdir_p(File.dirname(full_path))
-      File.open(full_path, 'w') do |f|
-        f.write(content)
+      unless already_wrote
+        full_path = File.join(directory(match), match[:path])
+        FileUtils.mkdir_p(File.dirname(full_path))
+        File.open(full_path, 'w') do |f|
+          f.write(content)
+        end
       end
       content
     end
