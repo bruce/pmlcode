@@ -24,14 +24,17 @@ Will generate the referenced file, extracting it from the
 
 You can also extract the entire branch using the `-t full` option,
 process as many `.pml` files as you like at once, customize the
-pattern used to extract the metadata from filename, and more.
+pattern used to extract the metadata from the filename, and more.
 
-See `pmlcode --help` for more details.
+See `pmlcode --help` for more details (or read `USAGE`
+in [PMLCode::CLI](./lib/pmlcode/cli.rb)).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/bruce/pmlcode.
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/bruce/pmlcode.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of
+the [MIT License](http://opensource.org/licenses/MIT).
