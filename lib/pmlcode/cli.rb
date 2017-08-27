@@ -61,6 +61,8 @@ module PMLCode::CLI
   Currently the ref retrieved from git repositories is always in the form `chapter.snapshot`,
   using the information matched using the --pattern.
 
+  ## OPTIONS
+
   EOU
 
   REQUIRED_PATTERN_CAPTURES = %w(coderoot chapter snapshot path)
@@ -131,15 +133,15 @@ module PMLCode::CLI
     OptionParser.new do |opts|
       opts.banner = USAGE
 
-      opts.on("-t [TYPE]", "--type", [:sparse, :full], "Export type (sparse, full)") do |value|
+      opts.on("-t [TYPE]", "--type", [:sparse, :full], "Export type (sparse, full; default: #{options.type})") do |value|
         options.type = value
       end
 
-      opts.on("-a [PATH]", "--application-directory", "Application directory (default: #{options.app}") do |value|
+      opts.on("-a [PATH]", "--application-directory", "Application directory (default: #{options.app || "NONE"})") do |value|
         options.app = value
       end
 
-      opts.on("-p [PATTERN]", "--pattern", "Pattern (default: #{options.pattern.source}") do |value|
+      opts.on("-p [PATTERN]", "--pattern", "Pattern (default: \"#{options.pattern.source}\")") do |value|
         options.pattern = Regexp.new(value)
       end
 
