@@ -6,15 +6,21 @@ class PMLCode::FullUpdater < PMLCode::Updater
 
   private
 
-  def update(match)
+  def update(match, already_wrote)
     full_path = directory(match)
     FileUtils.mkdir_p(full_path)
     success = false
+    content = nil
     Dir.chdir(@options.app) do
-      system "git archive '#{match[:chapter]}.#{match[:snapshot]}' | tar -x -C '#{full_path}'"
-      success = $?.success?
+      content = `git show origin/#{match[:chapter]}.#{match[:snapshot]}:#{match[:path]}`
+      if already_wrote || @options.dry_run
+        success = true
+      else
+        system "git archive '#{match[:chapter]}.#{match[:snapshot]}' | tar -x -C '#{full_path}'"
+        success = $?
+      end
     end
-    success
+    success ? content : nil
   end
 
   def generate_update_id(match)

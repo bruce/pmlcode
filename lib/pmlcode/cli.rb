@@ -8,6 +8,8 @@ module PMLCode::CLI
 
       pmlcode [PML_PATH, ...] [OPTIONS]
 
+  PML_PATHs can optionally include a :LINENUM suffix.
+
   ## SYNOPSIS
 
   Looks for `<embed>` tags whose `file` attribute match `--pattern`, extracting the
@@ -80,11 +82,11 @@ module PMLCode::CLI
     parser = build_parser(options)
     parser.parse!(args)
 
-    files = prepare(options, parser, args)
+    sources = prepare(options, parser, args)
 
-    files.each do |pml|
-      options.pml = pml
-      options.output = File.dirname(pml)
+    sources.each do |source|
+      options.source = source
+      options.output = File.dirname(source.path)
       update!(options)
     end
 
@@ -119,14 +121,14 @@ module PMLCode::CLI
       $stderr.puts parser
       exit
     end
-    files = args.map { |pml| File.expand_path(pml) }
-    missing = files.select { |pml| !File.exists?(pml) }
+    sources = args.map { |pml| PMLCode::Source.parse(pml) }
+    missing = sources.select(&:missing?)
     unless missing.empty?
-      $stderr.puts "PML files #{missing} not found"
+      $stderr.puts "PML sources #{missing} not found"
       puts parser
       exit
     end
-    files
+    sources
   end
 
   def self.build_parser(options)
@@ -143,6 +145,18 @@ module PMLCode::CLI
 
       opts.on("-p [PATTERN]", "--pattern", "Pattern (default: \"#{options.pattern.source}\")") do |value|
         options.pattern = Regexp.new(value)
+      end
+
+      opts.on('-c', '--content', "Show content") do
+        options.content = true
+      end
+
+      opts.on("-V", "--verbose", "Verbose output (Only useful with --content)") do
+        options.verbose = true
+      end
+
+      opts.on('-x', '--dry-run', "Dry run (do not write files)") do
+        options.dry_run = true
       end
 
       opts.on_tail("-h", "--help", "Show this message") do
