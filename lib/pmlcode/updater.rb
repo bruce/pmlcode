@@ -87,8 +87,8 @@ class PMLCode::Updater
   end
 
   def check_part!(text, part)
+    content = PMLCode::Content.parse(text)
     if part
-      content = PMLCode::Content.parse(text)
       if content.has_part?(part)
         print Rainbow("OK").green
       else
@@ -98,6 +98,8 @@ class PMLCode::Updater
       print Rainbow("--").gray
     end
     puts " : PART #{part}"
+    puts "\n"
+    puts PMLCode::Display.new(content, part)
   end
 
   def generate_content_id(match)

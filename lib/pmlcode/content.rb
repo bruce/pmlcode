@@ -1,4 +1,5 @@
 class PMLCode::Content
+  include Enumerable
 
   def self.parse(text)
     parser = Parser.new(text)
@@ -11,6 +12,10 @@ class PMLCode::Content
 
   def has_part?(name)
     @lines.any? { |l| l.part == name }
+  end
+
+  def each(&block)
+    @lines.each(&block)
   end
 
   def to_s
