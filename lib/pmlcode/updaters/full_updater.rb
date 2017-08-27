@@ -13,7 +13,7 @@ class PMLCode::FullUpdater < PMLCode::Updater
     content = nil
     Dir.chdir(@options.app) do
       content = `git show origin/#{match[:chapter]}.#{match[:snapshot]}:#{match[:path]}`
-      if already_wrote
+      if already_wrote || @options.dry_run
         success = true
       else
         system "git archive '#{match[:chapter]}.#{match[:snapshot]}' | tar -x -C '#{full_path}'"

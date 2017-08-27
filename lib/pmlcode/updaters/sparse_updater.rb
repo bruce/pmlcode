@@ -14,7 +14,7 @@ class PMLCode::SparseUpdater < PMLCode::Updater
       success = $?.success?
     end
     if success
-      unless already_wrote
+      unless already_wrote || @options.dry_run
         full_path = File.join(directory(match), match[:path])
         FileUtils.mkdir_p(File.dirname(full_path))
         File.open(full_path, 'w') do |f|

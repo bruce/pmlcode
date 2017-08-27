@@ -42,7 +42,7 @@ class PMLCode::Updater
   end
 
   def initialize(options)
-    @pml = options.pml
+    @source = options.source
     @options = options
     @current_prefix = nil
     @wrote = {}
@@ -51,20 +51,26 @@ class PMLCode::Updater
 
   def embeds
     @embeds ||= begin
-      doc = Nokogiri::XML(File.read(@pml))
-      doc.css('embed')
+      doc = Nokogiri::XML(File.read(@source.path))
+      doc.css('embed').select do |embed|
+        if @source.line
+          embed.line == @source.line
+        else
+          true
+        end
+      end
     end
   end
 
   def run
     embeds.each do |embed|
-      puts Rainbow(File.basename(@pml) + ":#{embed.line} ").bold.underline
+      puts Rainbow(File.basename(@source.path) + ":#{embed.line} ").bold.underline
       match = @options.pattern.match(embed[:file])
       if match
         text = dedup(match) { |already_wrote| update(match, already_wrote) }
         if text
           print Rainbow("OK").green
-          puts " : FILE #{embed[:file]}"
+          puts " : FILE #{embed[:file]} #{write_flag}"
           check_part!(text, embed[:part])
         else
           print Rainbow("ERROR").red
@@ -101,6 +107,14 @@ class PMLCode::Updater
     puts "\n"
     if @options.content
       puts PMLCode::Display.new(content, part, @options)
+    end
+  end
+
+  def write_flag
+    if @options.dry_run
+      Rainbow("  DRY RUN  ").green.inverse
+    else
+      Rainbow("  WRITTEN  ").yellow.inverse
     end
   end
 

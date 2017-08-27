@@ -10,4 +10,5 @@ module PMLCode
   autoload :Updater, 'pmlcode/updater'
   autoload :Content, 'pmlcode/content'
   autoload :Display, 'pmlcode/display'
+  autoload :Source,  'pmlcode/source'
 end
