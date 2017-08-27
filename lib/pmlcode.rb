@@ -1,6 +1,7 @@
-require "pmlcode/version"
-
 require "nokogiri"
+require "fileutils"
+
+require "pmlcode/version"
 
 module PMLCode
   autoload :CLI,     'pmlcode/cli'

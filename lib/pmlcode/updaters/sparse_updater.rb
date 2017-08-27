@@ -1,5 +1,3 @@
-require 'fileutils'
-
 class PMLCode::SparseUpdater < PMLCode::Updater
 
   handles do |criteria|
