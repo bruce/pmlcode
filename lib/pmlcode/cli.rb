@@ -6,7 +6,7 @@ module PMLCode::CLI
   USAGE =<<-EOU
   ## USAGE
 
-      pmlcode [PML_PATH, ...] [OPTIONS]
+      pmlcode [--export EXPORT_PATH] | [PML_PATH, ...] [OPTIONS]
 
   PML_PATHs can optionally include a :LINENUM suffix.
 
@@ -67,7 +67,6 @@ module PMLCode::CLI
 
   EOU
 
-  REQUIRED_PATTERN_CAPTURES = %w(coderoot chapter snapshot path)
   DEFAULT_PATTERN = /^(?<coderoot>[^\/]+)\/(?<chapter>[^\/]+)\/(?<snapshot>[^\/]+)\/(?<path>.+)$/
 
   DEFAULTS = {
@@ -82,53 +81,24 @@ module PMLCode::CLI
     parser = build_parser(options)
     parser.parse!(args)
 
-    sources = prepare(options, parser, args)
+    check_app!(options)
 
-    sources.each do |source|
-      options.source = source
-      options.output = File.dirname(source.path)
-      update!(options)
+    if options.export
+      PMLCode::ExportCommand.run(options)
+    else
+      PMLCode::UpdateCommand.run(options, parser, args)
     end
 
   end
 
   private
 
-  def self.update!(options)
-    updater = PMLCode::Updater.find(options)
-    unless updater
-      $stderr.puts "No updater found. --type '#{options.type}' may not be supported."
-      $stderr.puts parser
-      exit
-    end
-    updater.run(options)
-  end
-
-  def self.prepare(options, parser, args)
-    if args.empty?
-      $stderr.puts "No PML files given."
-      $stderr.puts parser
-      exit
-    end
+  def self.check_app!(options)
     unless options.app
       $stderr.puts "No --application-directory given."
       $stderr.puts parser
       exit
     end
-    unless REQUIRED_PATTERN_CAPTURES.all? { |cap| options.pattern.named_captures.key?(cap) }
-      $stderr.puts "Pattern does not define one or more required named captures: #{REQUIRED_NAMED_CAPTURES}"
-      $stderr.puts "Check your use of --pattern or the PMLCODE_PATTERN environment variable"
-      $stderr.puts parser
-      exit
-    end
-    sources = args.map { |pml| PMLCode::Source.parse(pml) }
-    missing = sources.select(&:missing?)
-    unless missing.empty?
-      $stderr.puts "PML sources #{missing} not found"
-      puts parser
-      exit
-    end
-    sources
   end
 
   def self.build_parser(options)
@@ -155,8 +125,12 @@ module PMLCode::CLI
         options.verbose = true
       end
 
-      opts.on('-x', '--dry-run', "Dry run (do not write files)") do
+      opts.on('--dry-run', "Dry run (do not write files)") do
         options.dry_run = true
+      end
+
+      opts.on('--export EXPORT_PATH', "Export all code branches to a cleaned-up Git repository at EXPORT_PATH") do |path|
+        options.export = path
       end
 
       opts.on_tail("-h", "--help", "Show this message") do

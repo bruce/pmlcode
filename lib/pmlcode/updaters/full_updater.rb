@@ -16,7 +16,7 @@ class PMLCode::FullUpdater < PMLCode::Updater
       if already_wrote || @options.dry_run
         success = true
       else
-        system "git archive '#{match[:chapter]}.#{match[:snapshot]}' | tar -x -C '#{full_path}'"
+        system "git archive 'origin/#{match[:chapter]}.#{match[:snapshot]}' | tar -x -C '#{full_path}'"
         success = $?
       end
     end

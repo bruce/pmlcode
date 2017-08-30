@@ -10,6 +10,10 @@ class PMLCode::Content
     @lines = lines
   end
 
+  def count
+    @lines.size
+  end
+
   def has_part?(name)
     @lines.any? { |l| l.in_part?(name) }
   end
@@ -26,10 +30,20 @@ class PMLCode::Content
 
     attr_reader :text
 
+    LABEL_PATTERN = /^(?<plaintext>.*?)\s*(#|\/\/)?\s*<label\s+id[^>]+>\s*$/
+
     def initialize(text, parts = [], highlighted = false)
       @text = text
       @parts = parts
       @highlighted = highlighted
+    end
+
+    def has_label?
+      plaintext != @text
+    end
+
+    def plaintext
+      @plaintext ||= find_plaintext
     end
 
     def in_part?(part = nil)
@@ -44,6 +58,17 @@ class PMLCode::Content
       @highlighted
     end
 
+    private
+
+    def find_plaintext
+      match = LABEL_PATTERN.match(@text)
+      if match
+        match[:plaintext]
+      else
+        @text
+      end
+    end
+
   end
 
   class Parser
@@ -53,6 +78,8 @@ class PMLCode::Content
 
     HL_START = /START_HIGHLIGHT/
     HL_END = /END_HIGHLIGHT/
+
+    ELIDE = /<literal:elide>/
 
     def initialize(raw)
       @raw = raw
@@ -72,6 +99,8 @@ class PMLCode::Content
 
     def process(text)
       case text
+      when ELIDE
+        nil
       when PART_START
         @parts << $1
         nil
