@@ -11,7 +11,7 @@ class PMLCode::FullUpdater < PMLCode::Updater
     FileUtils.mkdir_p(full_path)
     success = false
     content = nil
-    Dir.chdir(@options.app) do
+    Dir.chdir(application_path!(match)) do
       content = `git show origin/#{match[:chapter]}.#{match[:snapshot]}:#{match[:path]}`
       if already_wrote || @options.dry_run
         success = true

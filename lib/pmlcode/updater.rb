@@ -62,6 +62,12 @@ class PMLCode::Updater
     end
   end
 
+  def application_path!(match)
+    appname = match[:app].gsub(/[^[:alnum:]]/, '').upcase
+    env_variable = "PMLCODE_APP_#{appname}_DIR"
+    ENV[env_variable] || (raise "Could not find environment variable #{env_variable}")
+  end
+
   def run
     embeds.each do |embed|
       puts Rainbow(File.basename(@source.path) + ":#{embed.line} ").bold.underline

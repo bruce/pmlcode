@@ -9,7 +9,7 @@ class PMLCode::SparseUpdater < PMLCode::Updater
   def update(match, already_wrote)
     success = false
     content = nil
-    Dir.chdir(@options.app) do
+    Dir.chdir(application_path!(match)) do
       content = `git show origin/#{match[:chapter]}.#{match[:snapshot]}:#{match[:path]}`
       success = $?.success?
     end

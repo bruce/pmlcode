@@ -47,16 +47,16 @@ module PMLCode::CLI
 
   ## ENVIRONMENT VARIABLES
 
-  PMLCODE_APP_DIR
-  : An optional working copy directory path, sets the default
-    for `--application-directory`
+  PMLCODE_APP_<APPNAME>_DIR
+  : The path to the working copy of each application. Note `APPNAME` is normalized (all uppercase
+    alphanumeric)
 
   PMLCODE_PATTERN
   : An optional pattern, sets the default for `--pattern`
 
   ## CUSTOM PATTERNS
 
-  Any custom pattern must have named captures for `coderoot`, `chapter`, `snapshot`, and `path`.
+  Any custom pattern must have named captures for `coderoot`, `chapter`, `app`, `snapshot`, and `path`.
 
   ## CUSTOM BRANCH/REFS
 
@@ -67,12 +67,11 @@ module PMLCode::CLI
 
   EOU
 
-  REQUIRED_PATTERN_CAPTURES = %w(coderoot chapter snapshot path)
-  DEFAULT_PATTERN = /^(?<coderoot>[^\/]+)\/(?<chapter>[^\/]+)\/(?<snapshot>[^\/]+)\/(?<path>.+)$/
+  REQUIRED_PATTERN_CAPTURES = %w(coderoot chapter app snapshot path)
+  DEFAULT_PATTERN = /^(?<coderoot>[^\/]+)\/(?<chapter>[^\/]+)\/(?<app>[^\/]+)\/(?<snapshot>[^\/]+)\/(?<path>.+)$/
 
   DEFAULTS = {
     type: :sparse,
-    app: ENV["PMLCODE_APP_DIR"],
     pattern: ENV["PMLCODE_PATTERN"] ? Regexp.new(ENV["PMLCODE_PATTERN"]) : DEFAULT_PATTERN
   }.freeze
 
@@ -110,11 +109,6 @@ module PMLCode::CLI
       $stderr.puts parser
       exit
     end
-    unless options.app
-      $stderr.puts "No --application-directory given."
-      $stderr.puts parser
-      exit
-    end
     unless REQUIRED_PATTERN_CAPTURES.all? { |cap| options.pattern.named_captures.key?(cap) }
       $stderr.puts "Pattern does not define one or more required named captures: #{REQUIRED_NAMED_CAPTURES}"
       $stderr.puts "Check your use of --pattern or the PMLCODE_PATTERN environment variable"
@@ -137,10 +131,6 @@ module PMLCode::CLI
 
       opts.on("-t [TYPE]", "--type", [:sparse, :full], "Export type (sparse, full; default: #{options.type})") do |value|
         options.type = value
-      end
-
-      opts.on("-a [PATH]", "--application-directory", "Application directory (default: #{options.app || "NONE"})") do |value|
-        options.app = value
       end
 
       opts.on("-p [PATTERN]", "--pattern", "Pattern (default: \"#{options.pattern.source}\")") do |value|
