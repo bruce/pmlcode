@@ -26,7 +26,7 @@ class PMLCode::SparseUpdater < PMLCode::Updater
   end
 
   def generate_update_id(match)
-    "#{match[:chapter]}.#{match[:snapshot]}/#{match[:path]}"
+    "#{match[:chapter]}.#{match[:app]}.#{match[:snapshot]}/#{match[:path]}"
   end
 
 end

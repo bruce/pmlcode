@@ -24,7 +24,7 @@ class PMLCode::FullUpdater < PMLCode::Updater
   end
 
   def generate_update_id(match)
-    "#{match[:chapter]}.#{match[:snapshot]}"
+    "#{match[:chapter]}.#{match[:app]}.#{match[:snapshot]}"
   end
 
 end
