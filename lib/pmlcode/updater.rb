@@ -133,7 +133,7 @@ class PMLCode::Updater
   end
 
   def directory(match)
-    File.expand_path(File.join(@options.output, match[:coderoot], match[:chapter], match[:snapshot]))
+    File.expand_path(File.join(@options.output, match[:coderoot], match[:chapter], match[:app], match[:snapshot]))
   end
 
 end
