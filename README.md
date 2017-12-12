@@ -13,14 +13,15 @@ See `pmlcode --help`
 ### Example
 
 Assuming `Chapter.pml` has an embed for
-`code/02-testing/01-start/test/some_test.exs`:
+`code/02-testing/myapp/01-start/test/some_test.exs`:
 
 This command:
 
-    $ pmlcode Chapter.pml -a /path/to/git/working/copy
+    $ pmlcode Chapter.pml
 
 Will generate the referenced file, extracting it from the
-`origin/02-testing.01-start` ref of `/path/to/git/working/copy`.
+`origin/02-testing.01-start` ref of the working copy located
+at `ENV["PMLCODE_APP_MYAPP_DIR"]`
 
 You can also extract the entire branch using the `-t full` option,
 process as many `.pml` files as you like at once, be warned of missing
